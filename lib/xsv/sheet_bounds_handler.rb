@@ -1,7 +1,12 @@
+# frozen_string_literal: true
+
 module Xsv
   # SheetBoundsHandler scans a sheet looking for the outer bounds of the content within
   class SheetBoundsHandler < Ox::Sax
     include Xsv::Helpers
+
+    DIMENSION_SPLITTER = ":".freeze
+    MAX_ROW_PATTERN = /\d+$/.freeze
 
     def self.get_bounds(sheet, workbook)
       rows = 0
@@ -61,12 +66,12 @@ module Xsv
       elsif @state == :row && name == :r
         @row = value.to_i
       elsif @state == :dimension && name == :ref
-        _firstCell, lastCell = value.split(":")
+        _firstCell, lastCell = value.split(DIMENSION_SPLITTER)
 
         if lastCell
           @maxColumn = column_index(lastCell)
           unless @trim_empty_rows
-            @maxRow = lastCell[/\d+$/].to_i
+            @maxRow = lastCell[MAX_ROW_PATTERN].to_i
             @block.call(@maxRow, @maxColumn)
           end
         end

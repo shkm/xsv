@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Xsv
   module Helpers
     BUILT_IN_NUMBER_FORMATS = {
@@ -36,17 +38,23 @@ module Xsv
 
     MINUTE = 60.freeze
     HOUR = 3600.freeze
+    COLUMN_INDEX_PATTERN = /^[A-Z]+/.freeze
+    A_CODE = 'A'.ord.freeze
+    TIME_FORMAT = '%02d:%02d'.freeze 
+    TIME_FORMAT_PATTERN = /[hms]+/.freeze
+    DATE_FORMAT_PATTERN = /[dmy]+/.freeze
 
     # Return the index number for the given Excel column name
     def column_index(col)
-      col = col[/^[A-Z]+/]
+      col = col[COLUMN_INDEX_PATTERN]
 
       val = 0
       while col.length > 0
         val *= 26
-        val += (col[0].ord - "A".ord + 1)
+        val += (col[0].ord - A_CODE + 1)
         col = col[1..-1]
       end
+
       return val - 1
     end
 
@@ -73,7 +81,7 @@ module Xsv
         minutes = minutes % 60
       end
 
-      "%02d:%02d" % [hours, minutes]
+      TIME_FORMAT % [hours, minutes]
     end
 
     def parse_datetime(number)
@@ -119,14 +127,14 @@ module Xsv
     def is_date_format?(format)
       return false if format.nil?
       # If it contains at least 2 sequences of d's, m's or y's it's a date!
-      format.scan(/[dmy]+/).length > 1
+      format.scan(DATE_FORMAT_PATTERN).length > 1
     end
 
     # Tests if the given format string is a time
     def is_time_format?(format)
       return false if format.nil?
       # If it contains at least 2 sequences of h's, m's or s's it's a time!
-      format.scan(/[hms]+/).length > 1
+      format.scan(TIME_FORMAT_PATTERN).length > 1
     end
   end
 end

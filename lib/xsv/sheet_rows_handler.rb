@@ -1,14 +1,22 @@
+# frozen_string_literal: true
+
 module Xsv
   class SheetRowsHandler < Ox::Sax
     include Xsv::Helpers
 
+    TYPES = {
+      shared_string: 's'.freeze,
+      string: 'str'.freeze,
+      empty: 'e'.freeze
+    }.freeze
+
     def format_cell
       case @current_cell[:t]
-      when "s"
+      when TYPES[:shared_string]
         @workbook.shared_strings[@current_value.to_i]
-      when "str"
+      when TYPES[:string]
         @current_value
-      when "e" # N/A
+      when TYPES[:empty] # N/A
         nil
       when nil
         if @current_value == ""
