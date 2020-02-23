@@ -3,6 +3,7 @@ require 'zip'
 
 module Xsv
   class Workbook
+    START_DATA = "PK\x03\x04".freeze
 
     attr_reader :sheets, :shared_strings, :xfs, :numFmts, :trim_empty_rows
 
@@ -10,7 +11,7 @@ module Xsv
     def self.open(data, **kws)
       if data.is_a?(IO)
         @workbook = self.new(Zip::File.open_buffer(data), **kws)
-      elsif data.start_with?("PK\x03\x04")
+      elsif data.start_with?(START_DATA)
         @workbook = self.new(Zip::File.open_buffer(data), **kws)
       else
         @workbook = self.new(Zip::File.open(data), **kws)

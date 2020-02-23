@@ -3,19 +3,23 @@ module Xsv
   class SheetRowsHandler < Ox::Sax
     include Xsv::Helpers
 
+    CELL_TYPE_SHARED_STRING = "s".freeze
+    CELL_TYPE_STRING = "str".freeze
+    CELL_TYPE_EMPTY = "e".freeze
+
     def format_cell
       case @current_cell[:t]
-      when "s"
+      when CELL_TYPE_SHARED_STRING
         @workbook.shared_strings[@current_value.to_i]
-      when "str"
+      when CELL_TYPE_STRING
         @current_value
-      when "e" # N/A
+      when CELL_TYPE_EMPTY # N/A
         nil
       when nil
-        if @current_value == ""
+        if @current_value.empty?
           nil
-        elsif @current_cell[:s]
-          style = @workbook.xfs[@current_cell[:s].to_i]
+        elsif (string = @current_cell[:s])
+          style = @workbook.xfs[string.to_i]
           numFmt = @workbook.numFmts[style[:numFmtId].to_i]
 
           parse_number_format(@current_value, numFmt)

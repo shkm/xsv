@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Xsv
   module Helpers
     BUILT_IN_NUMBER_FORMATS = {
@@ -37,8 +38,9 @@ module Xsv
 
     MINUTE = 60.freeze
     HOUR = 3600.freeze
-    A_CODEPOINT = 'A'.ord.freeze
+    A_CODEPOINT = "A".ord.freeze
     EPOCH = Date.new(1899, 12, 30).freeze
+    DOT = ".".freeze
 
     # Return the index number for the given Excel column name
     def column_index(col)
@@ -86,7 +88,7 @@ module Xsv
     end
 
     def parse_number(string)
-      if string.include? "."
+      if string.include? DOT
         string.to_f
       else
         string.to_i
